@@ -3,10 +3,21 @@ use anchor_lang::prelude::*;
 #[account]
 #[derive(InitSpace)]
 pub struct Escrow {
-    pub seed: u64,
+    pub task_id: u64,
     pub maker: Pubkey,
     pub mint_a: Pubkey,
-    pub mint_b: Pubkey,
-    pub receive: u64,
+    pub amount: u64,
     pub bump: u8,
+}
+#[account]
+#[derive(InitSpace)]
+pub struct MemeRatio {
+    pub mint_meme: Pubkey,
+    pub amount: u64, 
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct OwnerCap {
+    pub owner: Pubkey,
 }

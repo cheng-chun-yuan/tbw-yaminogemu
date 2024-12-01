@@ -5,10 +5,10 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-tbw_yaminogemu = "5SoL48UjfnBTkAHzi7xvuizLErjiUsJKcXfwCABThfgd"
+tbw_yaminogemu = "F3WVtr1yzW5dsYPLSvBKqF4LwD48YbcXYDjG74TxBFL6"
 
 [registry]
-url = "https://api.apr.dev"
+url = "devnet"
 
 [provider]
 cluster = "Devnet"

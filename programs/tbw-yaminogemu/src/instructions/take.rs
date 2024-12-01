@@ -44,7 +44,7 @@ pub struct Take<'info> {
         has_one = maker,
         has_one = mint_a,
         has_one = mint_b,
-        seeds = [b"escrow", maker.key().as_ref(), escrow.seed.to_le_bytes().as_ref()],
+        seeds = [b"escrow", maker.key().as_ref(), escrow.task_id.to_le_bytes().as_ref()],
         bump = escrow.bump
     )]
     escrow: Box<Account<'info, Escrow>>,
@@ -78,7 +78,7 @@ impl Take<'_> {
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",
             self.maker.to_account_info().key.as_ref(),
-            &self.escrow.seed.to_le_bytes()[..],
+            &self.escrow.task_id.to_le_bytes()[..],
             &[self.escrow.bump],
         ]];
 

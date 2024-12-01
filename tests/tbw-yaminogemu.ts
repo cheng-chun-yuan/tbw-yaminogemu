@@ -43,12 +43,12 @@ describe("tbw_yaminogemu", () => {
 
   const log = async (signature: string): Promise<string> => {
     console.log(
-      `Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=custom&customUrl=${connection.rpcEndpoint}`
+      `Your transaction signature: https://explorer.solana.com/transaction/${signature}?cluster=devnet`
     );
     return signature;
   };
 
-  const seed = new BN(randomBytes(8));
+  const task_id = new BN(randomBytes(8));
 
   const [maker, taker, mintA, mintB] = Array.from({ length: 4 }, () =>
     Keypair.generate()
@@ -63,18 +63,27 @@ describe("tbw_yaminogemu", () => {
     .flat();
 
   const escrow = PublicKey.findProgramAddressSync(
-    [Buffer.from("escrow"), maker.publicKey.toBuffer(), seed.toArrayLike(Buffer, "le", 8)],
+    [Buffer.from("escrow"), maker.publicKey.toBuffer(), task_id.toArrayLike(Buffer, "le", 8)],
     program.programId
   )[0];
+
+  const memeRatio = PublicKey.findProgramAddressSync(
+    [Buffer.from("meme"), mintA.publicKey.toBuffer()],
+    program.programId
+  )[0];
+  console.log(memeRatio.toBase58())
 
   const vault = getAssociatedTokenAddressSync(mintA.publicKey, escrow, true, tokenProgram);
 
   // Accounts
   const accounts = {
+    owner: maker.publicKey,
     maker: maker.publicKey,
     taker: taker.publicKey,
+    mintMeme: mintA.publicKey,
     mintA: mintA.publicKey,
     mintB: mintB.publicKey,
+    memeRatio,
     makerAtaA,
     makerAtaB,
     takerAtaA,
@@ -118,9 +127,9 @@ describe("tbw_yaminogemu", () => {
     await provider.sendAndConfirm(tx, [mintA, mintB, maker, taker]).then(log);
   });
 
-  it("Make", async () => {
+  it("Init", async () => {
     await program.methods
-      .make(seed, new BN(1e6), new BN(1e6))
+      .init()
       .accounts({ ...accounts })
       .signers([maker])
       .rpc()
@@ -128,7 +137,27 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  xit("Refund", async () => {
+  it("Add", async () => {
+    await program.methods
+      .add(new BN(1))
+      .accounts({ ...accounts })
+      .signers([maker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+  });
+
+  it("Create", async () => {
+    await program.methods
+      .create(task_id, new BN(1e6))
+      .accounts({ ...accounts })
+      .signers([maker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+  });
+
+  it("Refund", async () => {
     await program.methods
       .refund()
       .accounts({ ...accounts })
@@ -138,18 +167,18 @@ describe("tbw_yaminogemu", () => {
       .then(log);
   });
 
-  it("Take", async () => {
-    try {
-    await program.methods
-      .take()
-      .accounts({  ...accounts })
-      .signers([taker])
-      .rpc()
-      .then(confirm)
-      .then(log);
-    } catch(e) {
-      console.log(e);
-      throw(e)
-    }
-  });
+  // it("Take", async () => {
+  //   try {
+  //   await program.methods
+  //     .take()
+  //     .accounts({  ...accounts })
+  //     .signers([taker])
+  //     .rpc()
+  //     .then(confirm)
+  //     .then(log);
+  //   } catch(e) {
+  //     console.log(e);
+  //     throw(e)
+  //   }
+  // });
 });

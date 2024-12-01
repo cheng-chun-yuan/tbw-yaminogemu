@@ -6,20 +6,17 @@ use anchor_spl::{
 };
 
 use crate::Escrow;
+use crate::MemeRatio;
 
 #[derive(Accounts)]
-#[instruction(seed: u64)]
-pub struct Make<'info> {
+#[instruction(task_id: u64)]
+pub struct Create<'info> {
     #[account(mut)]
     pub maker: Signer<'info>,
     #[account(
         mint::token_program = token_program
     )]
     pub mint_a: InterfaceAccount<'info, Mint>,
-    #[account(
-        mint::token_program = token_program
-    )]
-    pub mint_b: InterfaceAccount<'info, Mint>,
     #[account(
         mut,
         associated_token::mint = mint_a,
@@ -28,10 +25,15 @@ pub struct Make<'info> {
     )]
     pub maker_ata_a: InterfaceAccount<'info, TokenAccount>,
     #[account(
+        seeds = [b"meme", mint_a.key().as_ref()],
+        bump
+    )]
+    pub meme_ratio: Account<'info, MemeRatio>,
+    #[account(
         init,
         payer = maker,
         space = 8 + Escrow::INIT_SPACE,
-        seeds = [b"escrow", maker.key().as_ref(), seed.to_le_bytes().as_ref()],
+        seeds = [b"escrow", maker.key().as_ref(), task_id.to_le_bytes().as_ref()],
         bump
     )]
     pub escrow: Account<'info, Escrow>,
@@ -48,20 +50,20 @@ pub struct Make<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl Make<'_> {
-    pub fn save_escrow(&mut self, seed: u64, receive: u64, bumps: &MakeBumps) -> Result<()> {
+impl Create<'_> {
+    pub fn create_task(&mut self, task_id: u64, bonk_amount: u64, bumps: &CreateBumps) -> Result<()> {
+        let amount = bonk_amount * self.meme_ratio.amount;
         self.escrow.set_inner(Escrow {
-            seed,
+            task_id,
             maker: self.maker.key(),
             mint_a: self.mint_a.key(),
-            mint_b: self.mint_b.key(),
-            receive,
+            amount,
             bump: bumps.escrow,
         });
         Ok(())
     }
 
-    pub fn deposit(&mut self, deposit: u64) -> Result<()> {
+    pub fn deposit(&mut self) -> Result<()> {
         let transfer_accounts = TransferChecked {
             from: self.maker_ata_a.to_account_info(),
             mint: self.mint_a.to_account_info(),
@@ -71,6 +73,6 @@ impl Make<'_> {
 
         let cpi_ctx = CpiContext::new(self.token_program.to_account_info(), transfer_accounts);
 
-        transfer_checked(cpi_ctx, deposit, self.mint_a.decimals)
+        transfer_checked(cpi_ctx, self.escrow.amount, self.mint_a.decimals)
     }
 }
