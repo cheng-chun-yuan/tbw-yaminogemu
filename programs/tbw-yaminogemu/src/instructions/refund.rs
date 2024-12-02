@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{
@@ -9,6 +8,7 @@ use anchor_spl::{
 };
 
 use crate::Escrow;
+use crate::error::ErrorCode;
 
 #[derive(Accounts)]
 pub struct Refund<'info> {
@@ -37,7 +37,7 @@ pub struct Refund<'info> {
         associated_token::authority = escrow,
         associated_token::token_program = token_program
     )]
-    pub vault: InterfaceAccount<'info, TokenAccount>,
+    pub vault_a: InterfaceAccount<'info, TokenAccount>,
     associated_token_program: Program<'info, AssociatedToken>,
     token_program: Interface<'info, TokenInterface>,
     system_program: Program<'info, System>,
@@ -45,6 +45,7 @@ pub struct Refund<'info> {
 
 impl Refund<'_> {
     pub fn refund_and_close_vault(&mut self) -> Result<()> {
+        require!(self.escrow.filled == false, ErrorCode::AlreadyFilledError);
         let signer_seeds: [&[&[u8]]; 1] = [&[
             b"escrow",
             self.maker.to_account_info().key.as_ref(),
@@ -53,7 +54,7 @@ impl Refund<'_> {
         ]];
 
         let xfer_accounts = TransferChecked {
-            from: self.vault.to_account_info(),
+            from: self.vault_a.to_account_info(),
             mint: self.mint_a.to_account_info(),
             to: self.maker_ata_a.to_account_info(),
             authority: self.escrow.to_account_info(),
@@ -65,10 +66,10 @@ impl Refund<'_> {
             &signer_seeds,
         );
 
-        transfer_checked(ctx, self.vault.amount, self.mint_a.decimals)?;
+        transfer_checked(ctx, self.vault_a.amount, self.mint_a.decimals)?;
 
         let close_accounts = CloseAccount {
-            account: self.vault.to_account_info(),
+            account: self.vault_a.to_account_info(),
             destination: self.maker.to_account_info(),
             authority: self.escrow.to_account_info(),
         };

@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("F3WVtr1yzW5dsYPLSvBKqF4LwD48YbcXYDjG74TxBFL6");
+declare_id!("BX5TD5DDvYR5PiU8mTeKuQLGJBPoy7yK6UadMMtZUkhf");
 
 #[program]
 pub mod tbw_yaminogemu {
@@ -32,8 +32,7 @@ pub mod tbw_yaminogemu {
         ctx.accounts.refund_and_close_vault()
     }
 
-    // pub fn take(ctx: Context<Take>) -> Result<()> {
-    //     ctx.accounts.deposit()?;
-    //     ctx.accounts.withdraw_and_close_vault()
-    // }
+    pub fn take(ctx: Context<Take>) -> Result<()> {
+        ctx.accounts.deposit()
+    }
 }
