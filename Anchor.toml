@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-tbw_yaminogemu = "BX5TD5DDvYR5PiU8mTeKuQLGJBPoy7yK6UadMMtZUkhf"
+tbw_yaminogemu = "DEzojzrGnQ7x2ZoFdSBZV52yF8FZRrouVJhqXoXRvvnz"
 
 [registry]
 url = "devnet"

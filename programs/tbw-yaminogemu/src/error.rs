@@ -6,4 +6,6 @@ pub enum ErrorCode {
     CustomError,
     #[msg("Already filled, can not withdraw")]
     AlreadyFilledError,
+    #[msg("Not filled, can not withdraw")]
+    NotFilledError,
 }

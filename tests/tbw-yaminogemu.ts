@@ -131,7 +131,7 @@ describe("tbw_yaminogemu", () => {
       .flatMap((x) => [
         createInitializeMint2Instruction(x.mint, 6, x.authority, null, tokenProgram),
         createAssociatedTokenAccountIdempotentInstruction(provider.publicKey, x.ata, x.authority, x.mint, tokenProgram),
-        createMintToInstruction(x.mint, x.ata, x.authority, 2e9, undefined, tokenProgram),
+        createMintToInstruction(x.mint, x.ata, x.authority, 3e9, undefined, tokenProgram),
       ])
     ];
 
@@ -155,7 +155,7 @@ describe("tbw_yaminogemu", () => {
 
   it("Add", async () => {
     await program.methods
-      .add(new BN(1))
+      .add(new BN(3))
       .accountsStrict({
         owner: maker.publicKey,
         mintMeme: mintA.publicKey,
@@ -238,6 +238,34 @@ describe("tbw_yaminogemu", () => {
         memeRatio: memeRatioB,
         escrow,
         vaultB,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+        tokenProgram,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([taker])
+      .rpc()
+      .then(confirm)
+      .then(log);
+    } catch(e) {
+      console.log(e);
+      throw(e)
+    }
+  });
+
+  it("Finalize", async () => {
+    try {
+    await program.methods
+      .finalize()
+      .accountsStrict({ 
+        winner: taker.publicKey,
+        maker: maker.publicKey,
+        mintWin: mintB.publicKey,
+        mintLose: mintA.publicKey,
+        winnerAtaWin: takerAtaB,
+        winnerAtaLose: takerAtaA,
+        escrow,
+        vaultWin: vaultB,
+        vaultLose: vaultA,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         tokenProgram,
         systemProgram: SystemProgram.programId,

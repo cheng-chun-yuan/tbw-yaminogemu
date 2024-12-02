@@ -30,7 +30,6 @@ pub struct Take<'info> {
     pub meme_ratio: Account<'info, MemeRatio>,
     #[account(
         mut,
-        close = maker,
         has_one = maker,
         seeds = [b"escrow", maker.key().as_ref(), escrow.task_id.to_le_bytes().as_ref()],
         bump = escrow.bump

@@ -9,7 +9,7 @@ pub use constants::*;
 pub use instructions::*;
 pub use state::*;
 
-declare_id!("BX5TD5DDvYR5PiU8mTeKuQLGJBPoy7yK6UadMMtZUkhf");
+declare_id!("DEzojzrGnQ7x2ZoFdSBZV52yF8FZRrouVJhqXoXRvvnz");
 
 #[program]
 pub mod tbw_yaminogemu {
@@ -24,7 +24,6 @@ pub mod tbw_yaminogemu {
     }
 
     pub fn create(ctx: Context<Create>, task_id: u64, bonk_amount: u64) -> Result<()> {
-        ctx.accounts.deposit()?;
         ctx.accounts.create_task(task_id, bonk_amount, &ctx.bumps)
     }
 
@@ -34,5 +33,9 @@ pub mod tbw_yaminogemu {
 
     pub fn take(ctx: Context<Take>) -> Result<()> {
         ctx.accounts.deposit()
+    }
+
+    pub fn finalize(ctx: Context<Finalize>) -> Result<()> {
+        ctx.accounts.send_and_close_vault()
     }
 }

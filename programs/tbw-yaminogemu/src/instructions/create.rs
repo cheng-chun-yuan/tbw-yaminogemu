@@ -60,11 +60,7 @@ impl Create<'_> {
             filled: false,
             bump: bumps.escrow,
         });
-        Ok(())
-    }
-
-    pub fn deposit(&mut self) -> Result<()> {
-        let amount = self.escrow.bonk_amount * self.meme_ratio.amount;
+        let amount = bonk_amount * self.meme_ratio.amount;
         let transfer_accounts = TransferChecked {
             from: self.maker_ata_a.to_account_info(),
             mint: self.mint_a.to_account_info(),

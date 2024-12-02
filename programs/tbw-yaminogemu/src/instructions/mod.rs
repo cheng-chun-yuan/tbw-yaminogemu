@@ -3,7 +3,9 @@ pub mod refund;
 pub mod take;
 pub mod init;
 pub mod add;
+pub mod finalize;
 
+pub use finalize::*;
 pub use add::*;
 pub use init::*;
 pub use take::*;
