@@ -1,14 +1,33 @@
 # tbw-yaminogemu
 
 ## Overview
+tbw-yaminogemu is a decentralized game platform where players can challenge each other with meme coins. It features a streamlined process for creating, accepting, and finalizing game challenges. The platform ensures fair play and transparency using blockchain technology.
 
-#### Init
+### Features
+#### Initialize (Init):
 
-#### Refund
+Assigns the owner of the platform.
+Sets up the environment for managing supported meme coins.
+#### Add:
 
-#### Take
+Allows the owner to add new types of supported meme coins.
+Expands the platform's compatibility with different tokens.
+#### Create:
 
-#### Finalize
+Players can deposit an amount to create a new game.
+Sets up a challenge for others to accept.
+#### Refund:
+
+Allows a player to quit an ongoing game.
+Players can reclaim their deposited funds if the game has not been accepted by another player.
+#### Take:
+
+Enables other players to accept a game challenge.
+Requires the challenger to deposit the same amount as the creator.
+#### Finalize:
+
+Concludes the game by sending the result back to the platform.
+Distributes funds to the winner based on the game result.
 
 ## Install, Build, Deploy and Test
 
